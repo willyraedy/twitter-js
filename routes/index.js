@@ -1,44 +1,47 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-
-const router = express.Router();
-// could use one line instead: const router = require('express').Router();
 const tweetBank = require('../tweetBank');
 
-// parse application/x-www-form-urlencoded
-router.use(bodyParser.urlencoded({ extended: false }))
+// could use one line instead: const router = require('express').Router();
 
-// parse application/json
-router.use(bodyParser.json());
+module.exports = function(io) {
 
-router.get('/', function (req, res) {
-  let tweets = tweetBank.list();
-  res.render( 'index', { tweets: tweets, showForm: true } );
-});
+  const router = express.Router();
+  // parse application/x-www-form-urlencoded
+  router.use(bodyParser.urlencoded({ extended: false }))
 
-router.get('/users/:name', function(req, res) {
-  var name = req.params.name;
-  console.log('Nameeeeeeeeeeeee', name);
-  var list = tweetBank.find( {name: name} );
-  res.render( 'index', { tweets: list, showForm: true, name: name});
-});
+  // parse application/json
+  router.use(bodyParser.json());
 
-router.post('/tweets', function(req, res){
-  let add = tweetBank.add(req.body.name, req.body.text);
-  console.log(req.body.name, req.body.text);
-  res.redirect('/');
-  //console.log(tweetBank.find())
-});
+  router.get('/', function (req, res) {
+    let tweets = tweetBank.list();
+    res.render( 'index', { tweets: tweets, showForm: true } );
+  });
 
-// let options = {
-//     root: path.resolve(__dirname, '..', 'public')
-// };
+  router.get('/users/:name', function(req, res) {
+    var name = req.params.name;
+    console.log('Nameeeeeeeeeeeee', name);
+    var list = tweetBank.find( {name: name} );
+    res.render( 'index', { tweets: list, showForm: true, name: name});
+  });
 
-router.use(express.static('public'));
+  router.post('/tweets', function(req, res){
+    let add = tweetBank.add(req.body.name, req.body.text);
+    io.sockets.emit('newTweet', { name: req.body.name, content: req.body.text });
+    // res.redirect('/');
+    //console.log(tweetBank.find())
+  });
 
-// router.get('/stylesheets/style.css', function(req, res, next){
-//     res.sendFile('/stylesheets/style.css', options);
-// });
+  // let options = {
+  //     root: path.resolve(__dirname, '..', 'public')
+  // };
 
-module.exports = router;
+  router.use(express.static('public'));
+
+  // router.get('/stylesheets/style.css', function(req, res, next){
+  //     res.sendFile('/stylesheets/style.css', options);
+  // });
+
+ return router;
+};

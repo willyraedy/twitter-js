@@ -2,9 +2,13 @@ let express = require('express');
 let morgan = require('morgan');
 let nunjucks = require('nunjucks');
 let routes = require('./routes')
+let socketio = require('socket.io');
 
 let app = express();
 let port = 3000;
+
+let server = app.listen(port, function() { console.log('Were Listening!')});
+let io = socketio.listen(server);
 
 app.set('view engine', 'html');
 app.engine('html', nunjucks.render);
@@ -12,9 +16,8 @@ nunjucks.configure('views', {noCache: true, autoescape: true});
 
 app.use(morgan('dev'));
 
-app.use('/', routes);
+app.use('/', routes(io));
 
-app.listen(port, function() { console.log('Were Listening!')});
 
 
 
