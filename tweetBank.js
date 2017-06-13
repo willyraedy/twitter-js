@@ -4,7 +4,10 @@ let data = [];
 
 
 function add (name, content) {
-  data.push({ name: name, content: content });
+  const index = data.length;
+  //console.log('index wihin add:', index)
+  data.push({ name: name, content: content, id: index });
+  //console.log('Tweet array',data);
 }
 
 function list () {
