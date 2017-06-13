@@ -10,10 +10,15 @@ router.get('/', function (req, res) {
   res.render( 'index', { tweets: tweets } );
 });
 
-let options = {
-    root: path.resolve(__dirname, '..', 'public')
-};
-console.log(options);
+router.get('/users/:name', function(req, res) {
+  var name = req.params.name;
+  var list = tweetBank.find( {name: name} );
+  res.render( 'index', { tweets: list } );
+});
+
+// let options = {
+//     root: path.resolve(__dirname, '..', 'public')
+// };
 
 router.use(express.static('public'));
 
